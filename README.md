@@ -6,7 +6,7 @@ the unofficial Robinhood API (pre-alpha)
 ```bash
 git clone https://github.com/james-yun/robinhood.git
 cd robinhood
-python3 myrobinhood.py
+python3 example.py
 ```
 I hope to publish to the [pip](https://pip.pypa.io/en/stable/) package manager once this production ready.
 
