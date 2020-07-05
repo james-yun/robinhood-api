@@ -100,8 +100,13 @@ def user():
 def account():
     url = 'https://api.robinhood.com/accounts/'
     r = session.get(url)
-    print(r.text)
     return r.json()['results'][0]
+
+
+def instruments(instrument):
+    url = f'https://api.robinhood.com/instruments/{instrument}/'
+    r = session.get(url)
+    return r.json()
 
 
 def positions():
@@ -112,10 +117,22 @@ def positions():
     r = r.json()
     positions = {}
     for result in r['results']:
-        instrument = result['instrument']
-        r = session.get(instrument).json()
+        instrument_url = result['instrument']
+        r = session.get(instrument_url).json()
         positions[r['symbol']] = {
             'quantity': result['quantity'],
             'average_buy_price': result['average_buy_price']
         }
     return positions
+
+
+def fundamentals(instrument):
+    url = f'https://api.robinhood.com/fundamentals/{instrument.upper()}/'
+    r = session.get(url)
+    return r.json()
+
+
+def quotes(instrument):
+    url = f'https://api.robinhood.com/marketdata/quotes/{instrument.upper()}/'
+    r = session.get(url)
+    return r.json()
