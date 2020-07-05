@@ -1,14 +1,11 @@
-# robinhood
+# robinhood [![PyPI version](https://badge.fury.io/py/robinhood-api.svg)](https://badge.fury.io/py/robinhood-api)
 the unofficial Robinhood API (pre-alpha)
 
 ## Installation
 
 ```bash
-git clone https://github.com/james-yun/robinhood.git
-cd robinhood
-python3 example.py
+pip install robinhood-api
 ```
-I hope to publish to the [pip](https://pip.pypa.io/en/stable/) package manager once this production ready.
 
 ## Authentication
 The first time you log in, you will be prompted to verify your identity by entering a code send to your phone or email. 
