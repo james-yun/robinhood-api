@@ -3,6 +3,7 @@ import requests
 import getpass
 
 session = requests.Session()
+account_url = None
 
 
 def oauth(payload):
@@ -47,9 +48,7 @@ def login(username=None, password=None, device_token='c77a7142-cc14-4bc0-a0ea-bd
 
     payload = {
         'grant_type': 'password',
-        'scope': 'internal',
         'client_id': 'c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS',
-        'expires_in': 86400,
         'device_token': device_token,
         'username': username,
         'password': password
@@ -97,14 +96,20 @@ def user():
         return True
 
 
-def account():
+def accounts():
+    global account_url
     url = 'https://api.robinhood.com/accounts/'
-    r = session.get(url)
-    return r.json()['results'][0]
+    r = session.get(url).json()
+    account_url = r['results'][0]['url']
+    return r['results'][0]
 
 
-def instruments(instrument):
-    url = f'https://api.robinhood.com/instruments/{instrument}/'
+def instruments(instrument=None, symbol=None):
+    url = 'https://api.robinhood.com/instruments/'
+    if instrument is not None:
+        url += f'{instrument}/'
+    if symbol is not None:
+        url += f'?symbol={symbol}'
     r = session.get(url)
     return r.json()
 
@@ -135,4 +140,16 @@ def fundamentals(instrument):
 def quotes(instrument):
     url = f'https://api.robinhood.com/marketdata/quotes/{instrument.upper()}/'
     r = session.get(url)
+    return r.json()
+
+
+def orders(price, symbol, instrument=None, quantity=1, type='market', side='buy', time_in_force='gfd',
+           trigger='immediate', account=None):
+    global account_url
+    if account is None:
+        account = account_url
+    if instrument is None:
+        instrument = fundamentals(symbol)['instrument']
+    url = 'https://api.robinhood.com/orders/'
+    r = session.post(url, json=locals())
     return r.json()
