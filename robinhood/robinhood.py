@@ -17,7 +17,7 @@ def oauth(payload):
     if 'access_token' in response:
         # save bearer_token and write to tokens.json
         session.headers['Authorization'] = 'Bearer ' + response['access_token']
-        with open('tokens.json', 'w') as file:
+        with open('../tokens.json', 'w') as file:
             file.write(json.dumps({
                 'bearer_token': response['access_token'],
                 'refresh_token': response['refresh_token'],
@@ -32,14 +32,17 @@ def login(username=None, password=None, device_token='c77a7142-cc14-4bc0-a0ea-bd
     global session
 
     # check if bearer token exists and is valid
-    with open('tokens.json') as file:
-        tokens = json.loads(file.read())
-        if 'bearer_token' in tokens:
-            session.headers['Authorization'] = 'Bearer ' + tokens['bearer_token']
-            if user():
-                return
-            else:
-                del session.headers['Authorization']
+    with open('tokens.json', 'w+') as file:
+        try:
+            tokens = json.loads(file.read())
+            if 'bearer_token' in tokens:
+                session.headers['Authorization'] = 'Bearer ' + tokens['bearer_token']
+                if user():
+                    return
+                else:
+                    del session.headers['Authorization']
+        except json.decoder.JSONDecodeError:
+            pass
 
     if username is None:
         username = input('Enter email or username: ')
@@ -55,7 +58,6 @@ def login(username=None, password=None, device_token='c77a7142-cc14-4bc0-a0ea-bd
     }
 
     r = oauth(payload)
-    print('login: ')
     if r.status_code == 400 or r.status_code == 401:
         # 400: incorrect credentials or unfamiliar device token
         print(r.text)
