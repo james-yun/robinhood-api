@@ -17,7 +17,7 @@ def oauth(payload):
     if 'access_token' in response:
         # save bearer_token and write to tokens.json
         session.headers['Authorization'] = 'Bearer ' + response['access_token']
-        with open('../tokens.json', 'w') as file:
+        with open('tokens.json', 'w') as file:
             file.write(json.dumps({
                 'bearer_token': response['access_token'],
                 'refresh_token': response['refresh_token'],
@@ -32,7 +32,7 @@ def login(username=None, password=None, device_token='c77a7142-cc14-4bc0-a0ea-bd
     global session
 
     # check if bearer token exists and is valid
-    with open('tokens.json', 'w+') as file:
+    with open('tokens.json') as file:
         try:
             tokens = json.loads(file.read())
             if 'bearer_token' in tokens:
@@ -58,31 +58,42 @@ def login(username=None, password=None, device_token='c77a7142-cc14-4bc0-a0ea-bd
     }
 
     r = oauth(payload)
-    if r.status_code == 400 or r.status_code == 401:
-        # 400: incorrect credentials or unfamiliar device token
-        print(r.text)
+    if r.status_code == 400:
         if r.json()['detail'] == 'Request blocked, challenge type required.':
             challenge_type = None
-            while challenge_type != 1 and challenge_type != 2:
-                challenge_type = int(input("\nWe're sending you a code to verify your login. Do you want us to:\n"
-                                           "  1: Text you the code\n"
-                                           "  2: Email it to you?\n"))
-                if challenge_type == 1:
+            while challenge_type not in ['1', '2']:
+                print('Unfamiliar device detected.')
+                challenge_type = input("We're sending you a code to verify your login. Do you want us to:\n"
+                                       "  1: Text you the code\n"
+                                       "  2: Email it to you?\n")
+                if challenge_type == '1':
                     print('Texting...')
                     payload['challenge_type'] = 'sms'
-                elif challenge_type == 2:
+                elif challenge_type == '2':
                     print('Emailing...')
                     payload['challenge_type'] = 'email'
             r = oauth(payload)
             del payload['challenge_type']
             challenge_id = r.json()['challenge']['id']
-            verification_code = input('Enter your verification code: ')
             url = f'https://api.robinhood.com/challenge/{challenge_id}/respond/'
-            r = session.post(url, json={'response': verification_code})
-            print(r.text)
+            verified = False
+            while verified is False:
+                verification_code = input('\nEnter your verification code: ')
+                r = session.post(url, json={'response': verification_code}).json()
+                if 'id' in r:
+                    verified = True
+                    print('\nVerified device.\n')
+                else:
+                    remaining_attempts = r['challenge']['remaining_attempts']
+                    if remaining_attempts > 0:
+                        print(f"Code is invalid. Remaining attempts: {remaining_attempts}.")
+                    else:
+                        raise RuntimeError('Verification failed.')
             session.headers['X-ROBINHOOD-CHALLENGE-RESPONSE-ID'] = challenge_id
-            r = oauth(payload)
+            oauth(payload)
             del session.headers['X-ROBINHOOD-CHALLENGE-RESPONSE-ID']
+        else:
+            raise RuntimeError('Unable to log in with provided credentials.')
     user()
 
 
