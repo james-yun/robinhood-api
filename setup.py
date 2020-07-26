@@ -5,13 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="robinhood-api",
-    version="0.0.2",
-    author="James Yun",
-    author_email="jameswyun99@gmail.com",
     description="the unofficial Robinhood API",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    version="0.0.3",
     url="https://github.com/james-yun/robinhood",
+    author="James Yun",
+    author_email="jameswyun99@gmail.com",
+    license='MIT',
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
