@@ -1,6 +1,6 @@
 # robinhood
 [![PyPI version](https://badge.fury.io/py/robinhood-api.svg)](https://badge.fury.io/py/robinhood-api)
-![PyPI workflow](https://github.com/james-yun/robinhood/workflows/Publish%20Python%20%F0%9F%90%8D%20distributions%20%F0%9F%93%A6%20to%20PyPI/badge.svg)  
+![Publish to PyPI workflow](https://github.com/james-yun/robinhood/workflows/Publish%20to%20PyPI%20workflow/badge.svg)
 
 the unofficial Robinhood API (pre-alpha)
 
