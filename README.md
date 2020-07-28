@@ -1,4 +1,4 @@
-# robinhood
+# robinhood-api
 [![PyPI version](https://badge.fury.io/py/robinhood-api.svg)](https://badge.fury.io/py/robinhood-api)
 ![Publish to PyPI workflow](https://github.com/james-yun/robinhood/workflows/Publish%20to%20PyPI%20workflow/badge.svg)
 
