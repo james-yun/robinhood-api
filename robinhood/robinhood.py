@@ -109,6 +109,9 @@ def login(username: str = None, password: str = None, device_token: str = 'c77a7
         else:
             raise RuntimeError('Unable to log in with provided credentials.')
 
+    elif r.status_code == 401:
+        raise RuntimeError('Unable to log in with provided credentials.')
+
     return r.json()['access_token']
 
 
