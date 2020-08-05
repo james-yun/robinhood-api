@@ -41,6 +41,7 @@ def login(username: str = None, password: str = None, device_token: str = 'c77a7
             return bearer_token
         else:
             print('Invalid/expired bearer token')
+            del session.headers['Authorization']
     # check if bearer token exists and is valid. create tokens.json if does not exist.
     if os.path.isfile('tokens.json'):
         with open('tokens.json', 'r') as file:
@@ -110,7 +111,7 @@ def login(username: str = None, password: str = None, device_token: str = 'c77a7
             raise RuntimeError('Unable to log in with provided credentials.')
 
     elif r.status_code == 401:
-        raise RuntimeError('Unable to log in with provided credentials.')
+        raise RuntimeError('Invalid bearer token.')
 
     return r.json()['access_token']
 
@@ -145,11 +146,12 @@ def instruments(instrument=None, symbol=None):
     return r.json()
 
 
-def positions():
-    url = 'https://api.robinhood.com/positions/?nonzero=true'
-    r = session.get(url)
+def positions(nonzero: bool = True):
+    url = 'https://api.robinhood.com/positions/'
+    r = session.get(url, params={'nonzero': nonzero})
     if r.status_code == 401:
-        raise Exception(r.text + '\nYour bearer_token may have expired. You can generate a new one in authenticate.py')
+        raise RuntimeError(
+            r.text + '\nYour bearer_token may have expired. You can generate a new one in authenticate.py')
     r = r.json()
     positions = {}
     for result in r['results']:
@@ -160,6 +162,24 @@ def positions():
             'average_buy_price': result['average_buy_price']
         }
     return positions
+
+
+def options_positions(nonzero: bool = True):
+    url = 'https://api.robinhood.com/options/aggregate_positions/'
+    r = session.get(url, params={'nonzero': nonzero})
+    return r.json()
+
+
+def live(account_number, span):
+    if span not in {'day', 'week', 'month', 'year', 'all'}:
+        raise RuntimeError(f"'{span}' is not valid as span.")
+    url = 'https://api.robinhood.com/historical/portfolio_v2/live/'
+    r = session.get(url, params={
+        'account_number': account_number,
+        'span': span,
+        'from': 0
+    })
+    return r.json()
 
 
 def fundamentals(instrument):
