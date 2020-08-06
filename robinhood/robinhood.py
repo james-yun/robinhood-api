@@ -37,7 +37,7 @@ def login(username: str = None, password: str = None, device_token: str = 'c77a7
 
     if bearer_token is not None:
         session.headers['Authorization'] = 'Bearer ' + bearer_token
-        if user():
+        if is_logged_in():
             return bearer_token
         else:
             print('Invalid/expired bearer token')
@@ -50,7 +50,7 @@ def login(username: str = None, password: str = None, device_token: str = 'c77a7
                 if 'bearer_token' in tokens:
                     bearer_token = tokens['bearer_token']
                     session.headers['Authorization'] = 'Bearer ' + bearer_token
-                    if user():
+                    if is_logged_in():
                         return bearer_token
                     else:
                         del session.headers['Authorization']
@@ -116,7 +116,7 @@ def login(username: str = None, password: str = None, device_token: str = 'c77a7
     return r.json()['access_token']
 
 
-def user() -> bool:
+def is_logged_in() -> bool:
     """checks whether user is logged in"""
     url = "https://api.robinhood.com/user/"
     r = session.get(url)
@@ -128,7 +128,13 @@ def user() -> bool:
         return True
 
 
-def accounts():
+def user() -> dict:
+    url = "https://api.robinhood.com/user/"
+    r = session.get(url)
+    return r.json()
+
+
+def accounts() -> dict:
     global account_url
     url = 'https://api.robinhood.com/accounts/'
     r = session.get(url).json()
@@ -136,7 +142,7 @@ def accounts():
     return r['results'][0]
 
 
-def instruments(instrument=None, symbol=None):
+def instruments(instrument=None, symbol=None) -> dict:
     url = 'https://api.robinhood.com/instruments/'
     if instrument is not None:
         url += f'{instrument}/'
@@ -146,7 +152,7 @@ def instruments(instrument=None, symbol=None):
     return r.json()
 
 
-def positions(nonzero: bool = True):
+def positions(nonzero: bool = True) -> dict:
     url = 'https://api.robinhood.com/positions/'
     r = session.get(url, params={'nonzero': str(nonzero).lower()})
     if r.status_code == 401:
@@ -164,13 +170,13 @@ def positions(nonzero: bool = True):
     return positions
 
 
-def options_positions(nonzero: bool = True):
+def options_positions(nonzero: bool = True) -> dict:
     url = 'https://api.robinhood.com/options/aggregate_positions/'
     r = session.get(url, params={'nonzero': nonzero})
     return r.json()
 
 
-def live(account_number, span):
+def live(account_number, span: str = 'day') -> dict:
     if span not in {'day', 'week', 'month', 'year', 'all'}:
         raise RuntimeError(f"'{span}' is not valid as span.")
     url = 'https://api.robinhood.com/historical/portfolio_v2/live/'
@@ -182,20 +188,20 @@ def live(account_number, span):
     return r.json()
 
 
-def fundamentals(instrument):
+def fundamentals(instrument) -> dict:
     url = f'https://api.robinhood.com/fundamentals/{instrument.upper()}/'
     r = session.get(url)
     return r.json()
 
 
-def quotes(instrument):
+def quotes(instrument) -> dict:
     url = f'https://api.robinhood.com/marketdata/quotes/{instrument.upper()}/'
     r = session.get(url)
     return r.json()
 
 
 def orders(price, symbol, instrument=None, quantity=1, type='market', side='buy', time_in_force='gfd',
-           trigger='immediate', account=None):
+           trigger='immediate', account=None) -> dict:
     global account_url
     if account is None:
         account = account_url
