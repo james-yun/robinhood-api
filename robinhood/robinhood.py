@@ -148,10 +148,10 @@ def instruments(instrument=None, symbol=None):
 
 def positions(nonzero: bool = True):
     url = 'https://api.robinhood.com/positions/'
-    r = session.get(url, params={'nonzero': nonzero})
+    r = session.get(url, params={'nonzero': str(nonzero).lower()})
     if r.status_code == 401:
         raise RuntimeError(
-            r.text + '\nYour bearer_token may have expired. You can generate a new one in authenticate.py')
+            r.text + '\nYour bearer_token may have expired.')
     r = r.json()
     positions = {}
     for result in r['results']:
