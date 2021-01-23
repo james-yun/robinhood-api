@@ -8,7 +8,7 @@ setuptools.setup(
     description="the unofficial Robinhood API",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="0.0.7",
+    version="0.1.0",
     url="https://github.com/james-yun/robinhood",
     author="James Yun",
     author_email="jameswyun99@gmail.com",
