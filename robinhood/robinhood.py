@@ -235,3 +235,9 @@ def orders(price, symbol, instrument=None, quantity=1, type='market', side='buy'
     url = 'https://api.robinhood.com/orders/'
     r = session.post(url, json=locals())
     return r.json()
+
+
+def search(query: str):
+    url = 'https://api.robinhood.com/midlands/search/'
+    r = session.get(url, params={'query': query})
+    return r.json()
