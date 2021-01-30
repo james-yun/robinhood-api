@@ -37,8 +37,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.publish.outputs.version }}
-        release_name: Release ${{ steps.publish.outputs.version }}
+        tag_name: v${{ steps.publish.outputs.version }}
+        release_name: Release v${{ steps.publish.outputs.version }}
         body: ${{ github.event.head_commit.message }}
         draft: false
         prerelease: false
@@ -46,13 +46,22 @@ jobs:
     - name: Debug
       run: ls
 
-    - name: Upload Release Asset
-      id: upload-release-asset 
+    - name: Upload tar.gz
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./my-artifact.zip
-        asset_name: my-artifact.zip
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/robinhood-api-${{ steps.publish.outputs.version }}.tar.gz
+        asset_name: robinhood-api-${{ steps.publish.outputs.version }}.tar.gz
         asset_content_type: application/gzip
+    
+    - name: Upload whl
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/robinhood_api-${{ steps.publish.outputs.version }}-py3-none-any.whl
+        asset_name: robinhood_api-${{ steps.publish.outputs.version }}-py3-none-any.whl
+        asset_content_type: application/zip
