@@ -6,7 +6,8 @@ import os
 session = requests.Session()
 account_url = None
 
-valid_times = {'5minute', '10minute', 'hour', 'day', 'week', 'month', '3month', 'year', 'all'}
+VALID_TIMES = {'5minute', '10minute', 'hour', 'day', 'week', 'month', '3month', 'year', 'all'}
+VALID_BOUNDS = {'regular', 'trading', 'extended', '24_7'}
 
 
 def oauth(payload):
@@ -190,7 +191,7 @@ def options_positions(nonzero: bool = True) -> dict:
 
 
 def live(account_number, span: str = 'day') -> dict:
-    if span not in valid_times:
+    if span not in VALID_TIMES:
         raise RuntimeError(f"'{span}' is not valid as span.")
     url = 'https://api.robinhood.com/historical/portfolio_v2/live/'
     r = session.get(url, params={
@@ -214,15 +215,15 @@ def quotes(instrument) -> dict:
 
 
 def historicals(instrument: str, bounds: str = 'regular', interval: str = '5minute', span: str = 'day') -> dict:
-    if bounds not in {'regular', 'trading', 'extended'}:
+    if bounds not in VALID_BOUNDS:
         raise RuntimeError(f"'{bounds}' is not valid as bounds.")
-    if interval not in valid_times:
+    if interval not in VALID_TIMES:
         raise RuntimeError(f"'{interval}' is not valid as interval.")
-    if span not in valid_times:
+    if span not in VALID_TIMES:
         raise RuntimeError(f"'{span}' is not valid as span.")
     url = f'https://api.robinhood.com/marketdata/historicals/{instrument}/?bounds={bounds}&interval={interval}'
-    r = session.get(url)
-    return r.json()
+    r = session.get(url).json()
+    return r
 
 
 def orders(price, symbol, instrument=None, quantity=1, type='market', side='buy', time_in_force='gfd',
