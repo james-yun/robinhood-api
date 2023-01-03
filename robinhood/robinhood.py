@@ -230,7 +230,7 @@ def historicals(instrument: str, bounds: str = 'regular', interval: str = '5minu
 
 
 def orders(price, symbol, instrument=None, quantity=1, type='market', side='buy', time_in_force='gfd',
-           trigger='immediate', account=None) -> dict:
+           trigger='immediate', account=None, extended_hours=True) -> dict:
     global account_url
     if account is None:
         account = account_url
